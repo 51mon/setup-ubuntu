@@ -85,10 +85,14 @@ desktop(){
   setsid unity
 }
 
-if test "$1" = all; then
+if test "$1" = server; then
   node.js
   node.js_post
-  #desktop
+  vim
+else if test "$1" = client; then
+  node.js
+  node.js_post
+  desktop
   # For t411 shitty windows encoding
   npm install iconv
 else
