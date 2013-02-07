@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+
+echo Setup of ubuntu 12.04
+node.js.old(){
+  sudo apt-get install build-essential libssl-dev curl git
+  cd
+  git clone git://github.com/creationix/nvm.git
+  . ~/nvm/nvm.sh
+  nvm install v0.8.12
+  curl http://npmjs.org/install.sh | sh
+}
+node_post(){
+  echo ". ~/nvm/nvm.sh" >>.bash_profile
+
+  npm install cookie inotify coffee-script
+  npm install coffee-script -g
+}
+
+
+node.js(){
+  echo # node.js
+  sudo apt-get install build-essential libssl-dev curl git
+  sudo apt-get install python-software-properties
+  sudo add-apt-repository ppa:chris-lea/node.js
+  sudo apt-get update
+  sudo apt-get install nodejs npm
+}
+
+vim(){
+  echo # vim
+
+  sudo apt-get install vim
+  mkdir -p ~/.vim/autoload
+  curl 'www.vim.org/scripts/download_script.php?src_id=16224' > ~/.vim/autoload/pathogen.vim
+  mkdir ~/.vim/bundle
+  cd ~/.vim/bundle
+  git clone https://github.com/kchmck/vim-coffee-script.git
+  cd
+  echo ':set tabstop=2
+:set shiftwidth=2
+:set expandtab
+call pathogen#infect()
+syntax on
+filetype plugin indent on
+"au BufWritePost *.coffee silent CoffeeMake! -b | cwindow | redraw!
+
+:highlight Comment ctermfg=blue' >> ~/.vimrc
+}
+
+mongodb(){
+  echo "# Mongodb"
+
+  http://www.ubuntugeek.com/how-to-install-mongodb-on-ubuntu-12-04-precise-server.html
+
+  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10
+  echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" | sudo tee -a /etc/apt/sources.list.d/10gen.list
+  sudo apt-get -y update
+  sudo apt-get -y install mongodb-10gen
+}
+
+desktop(){
+  echo "# Set theme to radiance"
+  gsettings set org.gnome.desktop.wm.preferences theme Radiance
+  echo "# Set top bar transparency & task switcher with compiz (manually)"
+  sudo apt-get ccsm
+
+  echo # Remove shitty scrollbars
+  gsettings set org.gnome.desktop.interface ubuntu-overlay-scrollbars false
+
+  echo # Remove boxes from unity bar
+
+  cd /usr/share/unity/5
+  sudo wget -O transparent54.png "https://drive.google.com/uc?export=download&confirm=no_antivirus&id=0B7yJf19YNEeLV0Z6dGRXS2dMQ28"
+  sudo wget -O transparent62.png "https://drive.google.com/uc?export=download&confirm=no_antivirus&id=0B7yJf19YNEeLLVZPZmZPOVV5STA"
+
+  for name in squircle_shine squircle_edge squircle_base squircle_base_selected launcher_icon_back launcher_icon_edge launcher_icon_shine; do sudo mv ${name}_54.png ${name}_54.ori.png && sudo ln -s transparent54.png ${name}_54.png; done
+
+  for name in squircle_shadow launcher_icon_glow launcher_icon_shadow; do sudo mv ${name}_62.png ${name}_62.ori.png && sudo ln -s transparent62.png ${name}_62.png; done
+
+  echo "Rollback :
+  for name in squircle_shine squircle_edge squircle_base squircle_base_selected launcher_icon_back launcher_icon_edge launcher_icon_shine; do sudo rm ${name}_54.png && sudo mv ${name}_54.ori.png ${name}_54.png; done
+
+  for name in squircle_shadow launcher_icon_glow launcher_icon_shadow; do sudo rm ${name}_62.png && sudo mv ${name}_62.ori.png ${name}_62.png; done"
+
+  setsid unity
+}
+
+if test "$1" = all; then
+  node.js
+  node.js_post
+  #desktop
+  # For t411 shitty windows encoding
+  npm install iconv
+else
+  for cmd in $@; do
+    $cmd
+  done
+fi
