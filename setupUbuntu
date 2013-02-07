@@ -13,7 +13,7 @@ node_post(){
   echo ". ~/nvm/nvm.sh" >>.bash_profile
 
   npm install cookie inotify coffee-script
-  npm install coffee-script -g
+  sudo npm install coffee-script -g
 }
 
 
