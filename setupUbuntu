@@ -89,7 +89,7 @@ if test "$1" = server; then
   node.js
   node.js_post
   vim
-else if test "$1" = client; then
+elif test "$1" = client; then
   node.js
   node.js_post
   desktop
